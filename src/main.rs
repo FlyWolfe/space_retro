@@ -13,22 +13,24 @@ fn conf() -> Conf {
         ..Default::default()
     }
 }
-
+#[derive(Copy, Clone)]
 pub struct Bullet
 {
     size:Vec3,
     color: Color, 
     velocity: Vec3,
     pos: Vec3,
+    age: f32,
 }
 
 impl Bullet {
-    pub fn new(size:Vec3, color:Color, velocity:Vec3, pos:Vec3)->Self{
+    pub fn new(size:Vec3, color:Color, velocity:Vec3, pos:Vec3, age:f32)->Self{
         Self{
             size,
             color,
             velocity,
             pos,
+            age,
         }
     }
 pub fn draw_m(&self,x:&Vec3, y:&Vec3)
@@ -37,7 +39,12 @@ pub fn draw_m(&self,x:&Vec3, y:&Vec3)
  draw_cube(self.pos, self.size, None, self.color);
 }
 pub fn update(&mut self,dt:f32){
-   self.pos +=self.velocity *dt;
+   self.age += self.age + 1.0;
+   self.pos += self.velocity * vec3(1.0, 1.0, 1.0) * self.age;
+   if self.age > 4000.0
+   {
+       drop(&self);
+   }
 }
 }
 #[macroquad::main(conf)]
@@ -65,11 +72,12 @@ async fn main() {
     let mut grabbed = true;
     set_cursor_grab(grabbed);
     show_mouse(false);
-    let mut b = Bullet{size:vec3(0.1, 0.1, 0.1), color:BLUE, velocity:vec3(0.0,0.0,0.5),pos:position};
+        let mut b = Bullet{size:vec3(0.1, 0.1, 0.1), color:BLUE, velocity:vec3(0.0,0.0,0.5),pos:position,age:0.0};
+
     loop 
     {
-        let delta = get_frame_time();
 
+        let delta = get_frame_time();
         if is_key_pressed(KeyCode::Escape) {
             break;
         }
@@ -130,7 +138,7 @@ async fn main() {
 
         draw_plane(vec3(0., 0., 0.), vec2(100., 100.), None, DARKGREEN);
 
-        draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
+        //draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
         b.draw_m(&position, &front);
         b.update(delta);
         // Back to screen space, render some text

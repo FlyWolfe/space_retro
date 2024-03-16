@@ -101,9 +101,9 @@ async fn main() {
             ..Default::default()
         });
 
-        draw_grid(20, 1., WHITE, GRAY);
+        draw_plane(vec3(0., 0., 0.), vec2(100., 100.), None, DARKGREEN);
 
-        draw_cube(vec3(0., 1., -6.), vec3(2., 2., 2.), None, GREEN);
+        draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
 
         // Back to screen space, render some text
 
@@ -114,14 +114,14 @@ async fn main() {
             10.0,
             48.0 + 18.0,
             30.0,
-            BLACK,
+            WHITE,
         );
         draw_text(
             format!("Press <TAB> to toggle mouse grab: {}", grabbed).as_str(),
             10.0,
             48.0 + 42.0,
             30.0,
-            BLACK,
+            WHITE,
         );
 
         next_frame().await

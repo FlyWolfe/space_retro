@@ -138,7 +138,7 @@ async fn main() {
 
         draw_plane(vec3(0., 0., 0.), vec2(100., 100.), None, DARKGREEN);
 
-        //draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
+        draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
         b.draw_m(&position, &front);
         b.update(delta);
         // Back to screen space, render some text

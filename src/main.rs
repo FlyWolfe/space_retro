@@ -1,6 +1,10 @@
 use macroquad::prelude::*;
 // use glam::vec3;
 
+mod player;
+
+use crate::player::player::Player;
+
 const MOVE_SPEED: f32 = 0.1;
 const LOOK_SPEED: f32 = 0.1;
 
@@ -31,14 +35,17 @@ async fn main() {
     )
     .normalize();
     let mut right = front.cross(world_up).normalize();
-    let mut up;
+    let mut up = right.cross(front).normalize();
 
-    let mut position = vec3(0.0, 1.0, 0.0);
     let mut last_mouse_position: Vec2 = mouse_position().into();
 
     let mut grabbed = true;
     set_cursor_grab(grabbed);
     show_mouse(false);
+
+    let mut player = Player::new(vec3(0., 1., 0.), BLUE, 30.);
+    let camera_offset = vec3(0., -10., -10.);
+    let mut camera_position = player.get_pos() + camera_offset;
 
     loop {
         let delta = get_frame_time();
@@ -52,17 +59,28 @@ async fn main() {
             show_mouse(!grabbed);
         }
 
+        camera_position = player.get_pos()
+            + (front * camera_offset.z)
+            + (right * camera_offset.x)
+            + (up * camera_offset.y);
+
         if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
-            position += front * MOVE_SPEED;
+            player.add_force(Vec3::Z, delta * 10.);
         }
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            position -= front * MOVE_SPEED;
+            player.add_force(-Vec3::Z, delta * 10.);
         }
         if is_key_down(KeyCode::Left) || is_key_down(KeyCode::A) {
-            position -= right * MOVE_SPEED;
+            player.add_force(Vec3::X, delta * 10.);
         }
         if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
-            position += right * MOVE_SPEED;
+            player.add_force(-Vec3::X, delta * 10.);
+        }
+        if is_key_down(KeyCode::Space) {
+            player.add_force(Vec3::Y, delta * 10.);
+        }
+        if is_key_down(KeyCode::LeftShift) {
+            player.add_force(-Vec3::Y, delta * 10.);
         }
 
         let mouse_position: Vec2 = mouse_position().into();
@@ -93,24 +111,29 @@ async fn main() {
         clear_background(BLACK);
 
         // Going 3d!
+        player.update(delta);
 
         set_camera(&Camera3D {
-            position: position,
-            up: up,
-            target: position + front,
+            position: camera_position,
+            up: world_up, //player.get_up_vector(),
+            target: player.get_pos(),
             ..Default::default()
         });
 
         draw_plane(vec3(0., 0., 0.), vec2(100., 100.), None, DARKGREEN);
-
         draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
+        player.draw();
 
         // Back to screen space, render some text
 
         set_default_camera();
 
         draw_text(
-            format!("X: {} Y: {}", mouse_position.x, mouse_position.y).as_str(),
+            format!(
+                "X: {} Y: {} Z: {}",
+                camera_position.x, camera_position.y, camera_position.z
+            )
+            .as_str(),
             10.0,
             48.0 + 18.0,
             30.0,

@@ -101,7 +101,7 @@ async fn main() {
             ..Default::default()
         });
 
-        draw_grid(20, 1., BLACK, LIGHTGRAY);
+        draw_grid(20, 1., WHITE, GRAY);
 
         draw_cube(vec3(0., 1., -6.), vec3(2., 2., 2.), None, GREEN);
 

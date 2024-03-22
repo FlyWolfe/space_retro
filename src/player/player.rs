@@ -1,10 +1,12 @@
 use macroquad::prelude::*;
 
+use crate::utils::mesh_utils::Model;
+
 pub struct Player {
     position: Vec3,
     velocity: Vec3,
     max_speed: f32,
-    //mesh: Mesh,
+    model: Model,
     color: Color,
     yaw: f32,
     pitch: f32,
@@ -17,11 +19,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(position: Vec3, color: Color, max_speed: f32) -> Self {
+    pub fn new(position: Vec3, color: Color, max_speed: f32, model: Model) -> Self {
         Self {
             position,
             velocity: vec3(0., 0., 0.),
             max_speed,
+            model,
             color,
             yaw: 0.,
             pitch: 0.,
@@ -35,17 +38,19 @@ impl Player {
     }
 
     pub fn draw(&self) {
-        // TODO: Draw ship mesh, not just cube
-        draw_cube(self.position, vec3(2., 5., 10.), None, self.color);
+        self.model.draw();
     }
 
     pub fn update(&mut self, dt: f32) {
+        let last_pos = self.position;
         self.position += self.velocity * dt;
         if self.stabilizing {
             self.stabilize(dt);
         } else {
             self.stabilizing = true;
         }
+
+        self.model.translate(self.position - last_pos);
     }
 
     pub fn stabilize(&mut self, dt: f32) {

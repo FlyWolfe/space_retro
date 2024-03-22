@@ -1,4 +1,6 @@
 use macroquad::prelude::*;
+use transform::transform::Transform;
+use utils::mesh_utils::Model;
 // use glam::vec3;
 
 mod player;
@@ -7,7 +9,7 @@ mod utils;
 
 use crate::player::player::Player;
 
-const ACCELERATION: f32 = 100.0;
+const ACCELERATION: f32 = 200.0;
 const BOOST: f32 = 2.0;
 const LOOK_SPEED: f32 = 0.1;
 
@@ -46,7 +48,10 @@ async fn main() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
-    let mut player = Player::new(vec3(0., 1., 0.), BLUE, 100.);
+    let mut test_model = Model::new("test.obj").await;
+    test_model.scale(10.);
+
+    let mut player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
     let camera_offset = vec3(0., 0., -50.);
     let mut camera_position = player.get_pos() + camera_offset;
 

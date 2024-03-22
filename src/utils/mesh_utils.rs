@@ -88,6 +88,6 @@ pub async fn load_model(file_name: &str) -> anyhow::Result<Model> {
         meshes,
         scale: vec3(1., 1., 1.),
         position: vec3(0., 0., 0.),
-        rotation: vec3(0., 0., 0.),
+        rotation: vec3(1., 0., 0.),
     })
 }

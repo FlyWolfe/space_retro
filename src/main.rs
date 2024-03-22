@@ -137,6 +137,14 @@ async fn main() {
         draw_cube(vec3(100., 100., 0.), vec3(100., 100., 100.), None, YELLOW);
 
         player.draw();
+        let mut q: Quat = Quat::IDENTITY;
+        let a: Vec3 = Vec3::cross(player.get_rotation(), front);
+        q.x = a.x;
+        q.y = a.y;
+        q.z = a.z;
+        q.w = f32::sqrt((player.get_rotation().length().powf(2.)) * (player.get_rotation().length().powf(2.))) + Vec3::dot(player.get_rotation(), front);
+        let rot = Vec3::from(q.to_euler(EulerRot::XYZ));
+        player.rotate(rot.length() * 10. * delta, rot);
 
         // Back to screen space, render some text
 

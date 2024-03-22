@@ -51,7 +51,14 @@ impl Player {
         }
 
         self.model.translate(self.position - last_pos);
-        self.model.rotate(10.0 * dt, Vec3::X);
+    }
+
+    pub fn rotate(&mut self, angle: f32, axis: Vec3) {
+        self.model.rotate(angle, axis);
+    }
+
+    pub fn get_rotation(&self) -> Vec3 {
+        self.model.rotation
     }
 
     pub fn stabilize(&mut self, dt: f32) {

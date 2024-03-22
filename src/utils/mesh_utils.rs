@@ -1,58 +1,33 @@
-use std::{io::{BufReader, Cursor}};
 use macroquad::prelude::*;
+use std::io::{BufReader, Cursor};
 
 //use crate::{model, texture};
-use crate::{transform::transform::Transform, utils::file_utils::{load_binary, load_string}};
+use crate::{
+    transform::transform::Transform,
+    utils::file_utils::{load_binary, load_string},
+};
 
 pub struct Model {
     pub meshes: Vec<Mesh>,
-    //pub position: Vec3,
-    //pub rotation: Quat,
-    //pub scale: Vec3,
+    pub position: Vec3,
+    pub rotation: Vec3,
+    pub scale: Vec3,
 }
-
 
 impl Model {
     pub async fn new(file_name: &str) -> Self {
         // TODO: Proper error handling
-        load_model(file_name).await.unwrap()//_or(Model { meshes: vec![] })
+        load_model(file_name).await.unwrap()
     }
 
     pub fn draw(&self) {
-        /*let context = macroquad::get_context();
-
-        context.gl.texture(mesh.texture.as_ref());
-        context.gl.draw_mode(DrawMode::Triangles);
-        context.gl.geometry(&mesh.vertices[..], &mesh.indices[..]);*/
         for mesh in &self.meshes {
             draw_mesh(&mesh);
         }
     }
-
-    pub fn scale(&mut self, amount: f32) {
-        let mut new_meshes: Vec<Mesh> = vec![];
-        for i in 0..self.meshes.len() {
-            let mut new_m = Mesh { vertices: self.meshes[i].vertices.clone(), indices: self.meshes[i].indices.clone(), texture: self.meshes[i].texture.clone() };
-            new_m.scale(amount, amount, amount);
-            new_meshes.push(new_m);
-        }
-        self.meshes = new_meshes;
-    }
-
-    pub fn translate(&mut self, translation: Vec3) {
-        let mut new_meshes: Vec<Mesh> = vec![];
-        for i in 0..self.meshes.len() {
-            let mut new_m = Mesh { vertices: self.meshes[i].vertices.clone(), indices: self.meshes[i].indices.clone(), texture: self.meshes[i].texture.clone() };
-            new_m.translate(translation);
-            new_meshes.push(new_m);
-        }
-        self.meshes = new_meshes;
-    }
 }
 
-pub async fn load_model(
-    file_name: &str,
-) -> anyhow::Result<Model> {
+pub async fn load_model(file_name: &str) -> anyhow::Result<Model> {
     let obj_text = load_string(file_name).await?;
     let obj_cursor = Cursor::new(obj_text);
     let mut obj_reader = BufReader::new(obj_cursor);
@@ -109,5 +84,10 @@ pub async fn load_model(
         })
         .collect::<Vec<_>>();
 
-    Ok(Model { meshes })
+    Ok(Model {
+        meshes,
+        scale: vec3(1., 1., 1.),
+        position: vec3(0., 0., 0.),
+        rotation: vec3(0., 0., 0.),
+    })
 }

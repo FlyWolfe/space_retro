@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::utils::mesh_utils::Model;
+use crate::{transform::transform::Transform, utils::mesh_utils::Model};
 
 pub struct Player {
     position: Vec3,
@@ -51,6 +51,7 @@ impl Player {
         }
 
         self.model.translate(self.position - last_pos);
+        self.model.rotate(10.0 * dt, Vec3::X);
     }
 
     pub fn stabilize(&mut self, dt: f32) {

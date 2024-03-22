@@ -49,7 +49,7 @@ async fn main() {
     show_mouse(false);
 
     let mut test_model = Model::new("test.obj").await;
-    test_model.scale(10.);
+    test_model.scale(10., 10., 10.);
 
     let mut player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
     let camera_offset = vec3(0., 0., -50.);

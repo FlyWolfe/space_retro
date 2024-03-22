@@ -1,7 +1,6 @@
 use macroquad::prelude::*;
 use transform::transform::Transform;
 use utils::mesh_utils::Model;
-// use glam::vec3;
 
 mod player;
 mod transform;
@@ -55,8 +54,20 @@ async fn main() {
     let camera_offset = vec3(0., 0., -50.);
     let mut camera_position = player.get_pos() + camera_offset;
 
+    let mut fps: i16 = 0;
+    let mut frames: i16 = 0;
+    let mut timer: f32 = 1.0;
+
     loop {
         let delta = get_frame_time();
+        timer -= delta;
+        frames += 1;
+        if timer <= 0. {
+            fps = frames;
+            timer = 1.0;
+            frames = 0;
+        }
+        
 
         if is_key_pressed(KeyCode::Escape) {
             break;
@@ -167,6 +178,13 @@ async fn main() {
             format!("Press <TAB> to toggle mouse grab: {}", grabbed).as_str(),
             10.0,
             48.0 + 42.0,
+            30.0,
+            WHITE,
+        );
+        draw_text(
+            format!("FPS: {}", fps).as_str(),
+            10.0,
+            48.0 + 66.0,
             30.0,
             WHITE,
         );

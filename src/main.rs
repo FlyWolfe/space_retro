@@ -54,20 +54,8 @@ async fn main() {
     let camera_offset = vec3(0., 0., -50.);
     let mut camera_position = player.get_pos() + camera_offset;
 
-    let mut fps: i16 = 0;
-    let mut frames: i16 = 0;
-    let mut timer: f32 = 1.0;
-
     loop {
         let delta = get_frame_time();
-        timer -= delta;
-        frames += 1;
-        if timer <= 0. {
-            fps = frames;
-            timer = 1.0;
-            frames = 0;
-        }
-        
 
         if is_key_pressed(KeyCode::Escape) {
             break;
@@ -182,7 +170,7 @@ async fn main() {
             WHITE,
         );
         draw_text(
-            format!("FPS: {}", fps).as_str(),
+            format!("FPS: {}", get_fps()).as_str(),
             10.0,
             48.0 + 66.0,
             30.0,

@@ -11,7 +11,7 @@ use crate::player::player::Player;
 const ACCELERATION: f32 = 200.0;
 const BOOST: f32 = 2.0;
 const LOOK_SPEED: f32 = 0.1;
-
+const FIRE_RATE1: f32 = 1.0;
 fn conf() -> Conf {
     Conf {
         window_title: String::from("Macroquad"),
@@ -21,7 +21,6 @@ fn conf() -> Conf {
         ..Default::default()
     }
 }
-
 #[macroquad::main(conf)]
 async fn main() {
     let mut x = 0.0;
@@ -51,12 +50,13 @@ async fn main() {
     test_model.scale(10., 10., 10.);
 
     let mut player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
-    let camera_offset = vec3(0., 0., -50.);
-    let mut camera_position = player.get_pos() + camera_offset;
 
-    loop {
+    loop 
+    {
+        let camera_offset = vec3(0., 0., -50.);
+        let mut camera_position = player.get_pos() + camera_offset;
+
         let delta = get_frame_time();
-
         if is_key_pressed(KeyCode::Escape) {
             break;
         }
@@ -145,6 +145,9 @@ async fn main() {
         let rot = Vec3::from(q.to_euler(EulerRot::XYZ));
         player.rotate(rot.length() * 10. * delta, rot);
 
+        draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
+        //b.draw_m(&player.get_pos(), &front);
+        //b.update(delta);
         // Back to screen space, render some text
 
         set_default_camera();
@@ -176,7 +179,6 @@ async fn main() {
             30.0,
             WHITE,
         );
-
         next_frame().await
     }
 }

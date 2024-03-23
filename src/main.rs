@@ -1,11 +1,14 @@
 use macroquad::prelude::*;
-// use glam::vec3;
+use transform::transform::Transform;
+use utils::mesh_utils::Model;
 
 mod player;
+mod transform;
+mod utils;
 
 use crate::player::player::Player;
 
-const ACCELERATION: f32 = 100.0;
+const ACCELERATION: f32 = 200.0;
 const BOOST: f32 = 2.0;
 const LOOK_SPEED: f32 = 0.1;
 const FIRE_RATE1: f32 = 1.0;
@@ -43,12 +46,15 @@ async fn main() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
+    let mut test_model = Model::new("test.obj").await;
+    test_model.scale(10., 10., 10.);
+
+    let mut player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
+
     loop 
     {
-
-    let mut player = Player::new(vec3(0., 1., 0.), BLUE, 100.);
-    let camera_offset = vec3(0., 0., -50.);
-    let mut camera_position = player.get_pos() + camera_offset;
+        let camera_offset = vec3(0., 0., -50.);
+        let mut camera_position = player.get_pos() + camera_offset;
 
         let delta = get_frame_time();
         if is_key_pressed(KeyCode::Escape) {
@@ -130,10 +136,18 @@ async fn main() {
         draw_cube(vec3(100., 100., 0.), vec3(100., 100., 100.), None, YELLOW);
 
         player.draw();
+        let mut q: Quat = Quat::IDENTITY;
+        let a: Vec3 = Vec3::cross(player.get_rotation(), front);
+        q.x = a.x;
+        q.y = a.y;
+        q.z = a.z;
+        q.w = f32::sqrt((player.get_rotation().length().powf(2.)) * (player.get_rotation().length().powf(2.))) + Vec3::dot(player.get_rotation(), front);
+        let rot = Vec3::from(q.to_euler(EulerRot::XYZ));
+        player.rotate(rot.length() * 10. * delta, rot);
 
         draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
-        b.draw_m(&player.get_pos(), &front);
-        b.update(delta);
+        //b.draw_m(&player.get_pos(), &front);
+        //b.update(delta);
         // Back to screen space, render some text
 
         set_default_camera();
@@ -155,6 +169,13 @@ async fn main() {
             format!("Press <TAB> to toggle mouse grab: {}", grabbed).as_str(),
             10.0,
             48.0 + 42.0,
+            30.0,
+            WHITE,
+        );
+        draw_text(
+            format!("FPS: {}", get_fps()).as_str(),
+            10.0,
+            48.0 + 66.0,
             30.0,
             WHITE,
         );

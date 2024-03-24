@@ -1,7 +1,10 @@
+use camera::camera::CameraState;
 use macroquad::prelude::*;
 use transform::transform::Transform;
 use utils::mesh_utils::Model;
+use bevy_ecs::{prelude::*, world::World};
 
+mod camera;
 mod player;
 mod transform;
 mod utils;
@@ -49,13 +52,20 @@ async fn main() {
     let mut test_model = Model::new("test.obj").await;
     test_model.scale(10., 10., 10.);
 
+    let mut world = World::new();
+
     let mut player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
+    world.spawn(player);
+
+    let mut camera = CameraState::new() 
+        camera_offset: todo!(), camera_position: todo!(), front, right, up
+    }
+
+    // Create a new Schedule, which defines an execution sptrategy for Systems
+    let mut schedule = Schedule::default();
 
     loop 
     {
-        let camera_offset = vec3(0., 0., -50.);
-        let mut camera_position = player.get_pos() + camera_offset;
-
         let delta = get_frame_time();
         if is_key_pressed(KeyCode::Escape) {
             break;
@@ -66,10 +76,7 @@ async fn main() {
             show_mouse(!grabbed);
         }
 
-        camera_position = player.get_pos()
-            + (front * camera_offset.z)
-            + (-right * camera_offset.x)
-            + (up * camera_offset.y);
+
 
         if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
             player.add_force(front, delta * ACCELERATION);

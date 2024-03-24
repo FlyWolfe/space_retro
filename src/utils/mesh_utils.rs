@@ -1,12 +1,10 @@
 use macroquad::prelude::*;
 use std::io::{BufReader, Cursor};
+use bevy_ecs::component::Component;
 
-//use crate::{model, texture};
-use crate::{
-    transform::transform::Transform,
-    utils::file_utils::{load_binary, load_string},
-};
+use crate::utils::file_utils::load_string;
 
+#[derive(Component)]
 pub struct Model {
     pub meshes: Vec<Mesh>,
     pub position: Vec3,

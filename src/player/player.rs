@@ -1,7 +1,9 @@
 use macroquad::prelude::*;
+use bevy_ecs::component::Component;
 
 use crate::{transform::transform::Transform, utils::mesh_utils::Model};
 
+#[derive(Component)]
 pub struct Player {
     position: Vec3,
     velocity: Vec3,

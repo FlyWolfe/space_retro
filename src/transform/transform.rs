@@ -1,5 +1,5 @@
 use macroquad::{
-    math::{vec3, EulerRot, Quat, Vec3},
+    math::{EulerRot, Quat, Vec3},
     models::Mesh,
 };
 

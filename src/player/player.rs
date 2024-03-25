@@ -1,7 +1,14 @@
+use bevy_ecs::{
+    component::Component,
+    system::{Query, Res},
+};
 use macroquad::prelude::*;
-use bevy_ecs::component::Component;
 
-use crate::{transform::transform::Transform, utils::mesh_utils::Model};
+use crate::{
+    camera::camera::CameraState, transform::transform::Transform, utils::mesh_utils::Model,
+};
+
+const ACCELERATION: f32 = 200.0;
 
 #[derive(Component)]
 pub struct Player {
@@ -98,4 +105,48 @@ impl Player {
     pub fn get_up_vector(&self) -> Vec3 {
         self.up
     }
+}
+
+pub fn player_input(mut query: Query<&mut Player>, camera: Res<CameraState>) {
+    let delta = get_frame_time();
+    let mut player = query.single_mut();
+    if is_key_down(KeyCode::Up) || is_key_down(KeyCode::W) {
+        player.add_force(camera.front, delta * ACCELERATION);
+    }
+    if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
+        player.add_force(-camera.front, delta * ACCELERATION);
+    }
+    if is_key_down(KeyCode::Left) || is_key_down(KeyCode::A) {
+        player.add_force(-camera.right, delta * ACCELERATION);
+    }
+    if is_key_down(KeyCode::Right) || is_key_down(KeyCode::D) {
+        player.add_force(camera.right, delta * ACCELERATION);
+    }
+    if is_key_down(KeyCode::Space) {
+        player.add_force(camera.up, delta * ACCELERATION);
+    }
+    if is_key_down(KeyCode::LeftControl) {
+        player.add_force(-camera.up, delta * ACCELERATION);
+    }
+}
+
+pub fn update_player(mut query: Query<&mut Player>, camera: Res<CameraState>) {
+    let mut player = query.single_mut();
+    let mut q: Quat = Quat::IDENTITY;
+    let a: Vec3 = Vec3::cross(player.get_rotation(), camera.front);
+    q.x = a.x;
+    q.y = a.y;
+    q.z = a.z;
+    q.w = f32::sqrt(
+        (player.get_rotation().length().powf(2.)) * (player.get_rotation().length().powf(2.)),
+    ) + Vec3::dot(player.get_rotation(), camera.front);
+    let rot = Vec3::from(q.to_euler(EulerRot::XYZ));
+    player.rotate(rot.length() * 10. * get_frame_time(), rot);
+
+    player.update(get_frame_time());
+}
+
+pub fn draw_player(mut query: Query<&Player>) {
+    let player = query.single();
+    player.draw();
 }

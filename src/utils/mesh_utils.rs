@@ -1,6 +1,6 @@
+use bevy_ecs::component::Component;
 use macroquad::prelude::*;
 use std::io::{BufReader, Cursor};
-use bevy_ecs::component::Component;
 
 use crate::utils::file_utils::load_string;
 

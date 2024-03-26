@@ -1,15 +1,13 @@
-use bevy_ecs::component::Component;
+use bevy_ecs::{component::Component, system::Query};
 use macroquad::prelude::*;
 use std::io::{BufReader, Cursor};
 
+use crate::transform::transform::Transform;
 use crate::utils::file_utils::load_string;
 
 #[derive(Component)]
 pub struct Model {
     pub meshes: Vec<Mesh>,
-    pub position: Vec3,
-    pub rotation: Vec3,
-    pub scale: Vec3,
 }
 
 impl Model {
@@ -18,10 +16,41 @@ impl Model {
         load_model(file_name).await.unwrap()
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&self, transform: &Transform) {
         for mesh in &self.meshes {
-            draw_mesh(&mesh);
+            draw_mesh(&get_transformed_mesh(mesh, transform));
         }
+    }
+}
+
+pub fn get_transformed_mesh(mesh: &Mesh, transform: &Transform) -> Mesh {
+    let mut new_m = Mesh {
+        vertices: mesh.vertices.clone(),
+        indices: mesh.indices.clone(),
+        texture: mesh.texture.clone(),
+    };
+
+    for v in 0..new_m.vertices.len() {
+        new_m.vertices[v].position.x *= transform.scale.x;
+        new_m.vertices[v].position.y *= transform.scale.y;
+        new_m.vertices[v].position.z *= transform.scale.z;
+
+        new_m.vertices[v].position = transform
+            .rotation
+            .mul_vec3(new_m.vertices[v].position - transform.position)
+            + transform.position;
+
+        new_m.vertices[v].position.x += transform.position.x;
+        new_m.vertices[v].position.y += transform.position.y;
+        new_m.vertices[v].position.z += transform.position.z;
+    }
+
+    return new_m;
+}
+
+pub fn draw_models(query: Query<(&Model, &Transform)>) {
+    for (model, transform) in query.iter() {
+        model.draw(transform);
     }
 }
 
@@ -82,10 +111,5 @@ pub async fn load_model(file_name: &str) -> anyhow::Result<Model> {
         })
         .collect::<Vec<_>>();
 
-    Ok(Model {
-        meshes,
-        scale: vec3(1., 1., 1.),
-        position: vec3(0., 0., 0.),
-        rotation: vec3(1., 0., 0.),
-    })
+    Ok(Model { meshes })
 }

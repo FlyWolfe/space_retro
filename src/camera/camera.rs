@@ -8,7 +8,9 @@ use macroquad::{
     time::get_frame_time,
 };
 
-use crate::{player::player::Player, utils::input_utils::MouseInput};
+use crate::{
+    player::player::Player, transform::transform::Transform, utils::input_utils::MouseInput,
+};
 
 const LOOK_SPEED: f32 = 0.1;
 
@@ -65,7 +67,7 @@ pub fn reset_camera(camera: Res<CameraState>) {
 }
 
 pub fn update_camera(
-    mut query: Query<&Player>,
+    query: Query<(&Player, &Transform)>,
     mut camera: ResMut<CameraState>,
     mouse_input: Res<MouseInput>,
 ) {
@@ -93,7 +95,8 @@ pub fn update_camera(
     camera.right = camera.front.cross(Vec3::Y).normalize();
     camera.up = camera.right.cross(camera.front).normalize();
 
-    camera.camera_position = query.get_single().unwrap().get_pos()
+    let (player, transform) = query.get_single().unwrap();
+    camera.camera_position = transform.position
         + (camera.front * camera.camera_offset.z)
         + (-camera.right * camera.camera_offset.x)
         + (camera.up * camera.camera_offset.y);

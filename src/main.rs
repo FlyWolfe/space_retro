@@ -9,7 +9,7 @@ mod player;
 mod transform;
 mod utils;
 
-use crate::player::player::Player;
+use crate::player::player::{Player, PlayerBundle};
 
 const BOOST: f32 = 2.0;
 const FIRE_RATE1: f32 = 1.0;
@@ -30,12 +30,19 @@ async fn main() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
-    let mut test_model = Model::new("test.obj").await;
-    test_model.scale(10., 10., 10.);
+    let test_model = Model::new("test.obj").await;
 
     let mut world = World::new();
 
-    let player = Player::new(vec3(0., 1., 0.), BLUE, 200., test_model);
+    let player = PlayerBundle {
+        player: Player::new(BLUE, 200.),
+        model: test_model,
+        transform: Transform {
+            position: vec3(0., 1., 0.),
+            scale: Vec3::ONE * 10.,
+            rotation: Quat::IDENTITY,
+        },
+    };
 
     let world_up = vec3(0.0, 1.0, 0.0);
     let yaw: f32 = 1.18;
@@ -52,7 +59,7 @@ async fn main() {
     let up = right.cross(front).normalize();
     let camera = CameraState::new(
         vec3(0., 0., -50.),
-        player.get_pos() + vec3(0., 0., -50.),
+        player.transform.position + vec3(0., 0., -50.),
         front,
         right,
         up,
@@ -73,8 +80,8 @@ async fn main() {
     schedule.add_systems(camera::camera::update_camera.before(player::player::player_input));
     schedule.add_systems(player::player::player_input.before(player::player::update_player));
     schedule.add_systems(player::player::update_player);
-    schedule.add_systems(camera::camera::reset_camera.after(player::player::update_player));
-    schedule.add_systems(player::player::draw_player.after(camera::camera::reset_camera));
+    schedule.add_systems(utils::mesh_utils::draw_models.after(player::player::update_player));
+    schedule.add_systems(camera::camera::reset_camera.after(utils::mesh_utils::draw_models));
 
     loop {
         if is_key_pressed(KeyCode::Escape) {

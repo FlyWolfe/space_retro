@@ -1,4 +1,5 @@
 use bevy_ecs::{
+    bundle::Bundle,
     component::Component,
     system::{Query, Res},
 };
@@ -12,10 +13,8 @@ const ACCELERATION: f32 = 200.0;
 
 #[derive(Component)]
 pub struct Player {
-    position: Vec3,
     velocity: Vec3,
     max_speed: f32,
-    model: Model,
     color: Color,
     yaw: f32,
     pitch: f32,
@@ -27,13 +26,18 @@ pub struct Player {
     stabilizer_power: f32,
 }
 
+#[derive(Bundle)]
+pub struct PlayerBundle {
+    pub player: Player,
+    pub model: Model,
+    pub transform: Transform,
+}
+
 impl Player {
-    pub fn new(position: Vec3, color: Color, max_speed: f32, model: Model) -> Self {
+    pub fn new(color: Color, max_speed: f32) -> Self {
         Self {
-            position,
             velocity: vec3(0., 0., 0.),
             max_speed,
-            model,
             color,
             yaw: 0.,
             pitch: 0.,
@@ -46,28 +50,16 @@ impl Player {
         }
     }
 
-    pub fn draw(&self) {
-        self.model.draw();
-    }
-
-    pub fn update(&mut self, dt: f32) {
-        let last_pos = self.position;
-        self.position += self.velocity * dt;
+    pub fn update(&mut self, transform: &mut Transform, dt: f32) {
+        let last_pos = transform.position;
+        transform.position += self.velocity * dt;
         if self.stabilizing {
             self.stabilize(dt);
         } else {
             self.stabilizing = true;
         }
 
-        self.model.translate(self.position - last_pos);
-    }
-
-    pub fn rotate(&mut self, angle: f32, axis: Vec3) {
-        self.model.rotate(angle, axis);
-    }
-
-    pub fn get_rotation(&self) -> Vec3 {
-        self.model.rotation
+        transform.translate(transform.position - last_pos);
     }
 
     pub fn stabilize(&mut self, dt: f32) {
@@ -86,10 +78,6 @@ impl Player {
         if dir != Vec3::ZERO {
             self.stabilizing = false;
         }
-    }
-
-    pub fn get_pos(&self) -> Vec3 {
-        self.position
     }
 
     pub fn get_yaw_pitch_roll(&self) -> Vec3 {
@@ -130,23 +118,18 @@ pub fn player_input(mut query: Query<&mut Player>, camera: Res<CameraState>) {
     }
 }
 
-pub fn update_player(mut query: Query<&mut Player>, camera: Res<CameraState>) {
-    let mut player = query.single_mut();
+pub fn update_player(mut query: Query<(&mut Player, &mut Transform)>, camera: Res<CameraState>) {
+    let (mut player, mut transform) = query.single_mut();
     let mut q: Quat = Quat::IDENTITY;
-    let a: Vec3 = Vec3::cross(player.get_rotation(), camera.front);
+    let rot = Vec3::from(Quat::to_euler(transform.rotation, EulerRot::XYZ));
+    let a: Vec3 = Vec3::cross(rot, camera.front);
     q.x = a.x;
     q.y = a.y;
     q.z = a.z;
-    q.w = f32::sqrt(
-        (player.get_rotation().length().powf(2.)) * (player.get_rotation().length().powf(2.)),
-    ) + Vec3::dot(player.get_rotation(), camera.front);
+    q.w =
+        f32::sqrt((rot.length().powf(2.)) * (rot.length().powf(2.))) + Vec3::dot(rot, camera.front);
     let rot = Vec3::from(q.to_euler(EulerRot::XYZ));
-    player.rotate(rot.length() * 10. * get_frame_time(), rot);
+    transform.rotate(rot.length() * 10. * get_frame_time(), rot);
 
-    player.update(get_frame_time());
-}
-
-pub fn draw_player(mut query: Query<&Player>) {
-    let player = query.single();
-    player.draw();
+    player.update(&mut transform, get_frame_time());
 }

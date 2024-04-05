@@ -1,6 +1,6 @@
-pub async fn load_string(file_name: &str) -> anyhow::Result<String> {
+pub async fn load_string(file_name: &str, folder_path: &str) -> anyhow::Result<String> {
     let path = std::path::Path::new(env!("OUT_DIR"))
-        .join("res")
+        .join(folder_path)
         .join(file_name);
     println!("Path: {}", path.to_str().unwrap());
     let txt = std::fs::read_to_string(path)?;

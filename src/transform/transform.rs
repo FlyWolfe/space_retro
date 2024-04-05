@@ -22,6 +22,7 @@ impl Transform {
             axis.y * angle,
             axis.z * angle,
         );
+
         self.rotation = rot.mul_quat(self.rotation);
     }
 

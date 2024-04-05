@@ -11,7 +11,7 @@ pub struct Bullet
 }
 
 impl Bullet {
-    pub fn new(size:Vec3, color:Color, velocity:Vec3, pos:Vec3, origin;Vec3)->Self{
+    pub fn new(size:Vec3, color:Color, velocity:Vec3, pos:Vec3, origin: Vec3)->Self{
         Self {
             size,
             color,

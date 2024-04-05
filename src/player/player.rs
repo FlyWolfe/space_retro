@@ -46,7 +46,7 @@ impl Player {
             right: Vec3::X,
             up: Vec3::Y,
             stabilizing: false,
-            stabilizer_power: 1.,
+            stabilizer_power: 2.,
         }
     }
 

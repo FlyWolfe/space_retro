@@ -1,8 +1,7 @@
 pub enum sDirection {
-    axis.x,
-    axis.y,
-    axis.z,
-
+    x,
+    y,
+    z,
 }
 
 pub struct sBullet;

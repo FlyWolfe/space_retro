@@ -9,7 +9,7 @@ edition = "2021"
 anyhow = "1.0.81"
 bevy_ecs = "0.13.1"
 bytemuck = { version = "1.15.0", features = [ "derive" ] }
-macroquad = "0.4.5"
+macroquad = { version = "0.4.6", git = "https://github.com/FlyWolfe/macroquad-retro3D.git", rev = "f4b66d9" }
 tobj = { version = "4.0.1", features = ["async"]}
 
 

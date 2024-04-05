@@ -1,4 +1,7 @@
-use bevy_ecs::system::{Query, Res, ResMut, Resource};
+use bevy_ecs::{
+    query::With,
+    system::{Query, Res, ResMut, Resource},
+};
 use macroquad::{
     camera::{set_camera, set_default_camera, Camera3D},
     color::{GRAY, ORANGE, PURPLE, RED, WHITE, YELLOW},
@@ -52,22 +55,10 @@ impl CameraState {
 
 pub fn reset_camera(camera: Res<CameraState>) {
     set_default_camera();
-
-    draw_text(
-        format!(
-            "Pos: X:{} Y:{} Z:{}",
-            camera.camera_position.x, camera.camera_position.y, camera.camera_position.z
-        )
-        .as_str(),
-        10.0,
-        48.0 + 24.0,
-        30.0,
-        WHITE,
-    );
 }
 
 pub fn update_camera(
-    query: Query<(&Player, &Transform)>,
+    query: Query<&Transform, With<Player>>,
     mut camera: ResMut<CameraState>,
     mouse_input: Res<MouseInput>,
 ) {
@@ -95,7 +86,7 @@ pub fn update_camera(
     camera.right = camera.front.cross(Vec3::Y).normalize();
     camera.up = camera.right.cross(camera.front).normalize();
 
-    let (player, transform) = query.get_single().unwrap();
+    let transform = query.get_single().unwrap();
     camera.camera_position = transform.position
         + (camera.front * camera.camera_offset.z)
         + (-camera.right * camera.camera_offset.x)
@@ -107,12 +98,4 @@ pub fn update_camera(
         target: camera.camera_position + camera.front * 10.,
         ..Default::default()
     });
-
-    draw_cube(vec3(0., 0., 10.), vec3(2., 2., 2.), None, RED);
-    draw_cube(vec3(100., 0., 60.), vec3(20., 20., 20.), None, GRAY);
-    draw_sphere(vec3(500., 300., 500.), 500., None, ORANGE);
-    draw_cube(vec3(100., 10., 600.), vec3(50., -50., 50.), None, PURPLE);
-    draw_cube(vec3(100., 100., 0.), vec3(100., 100., 100.), None, YELLOW);
-
-    draw_cube(vec3(0., 1., 6.), vec3(2., 2., 2.), None, RED);
 }

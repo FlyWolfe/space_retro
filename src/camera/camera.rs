@@ -3,12 +3,7 @@ use bevy_ecs::{
     system::{Query, Res, ResMut, Resource},
 };
 use macroquad::{
-    camera::{set_camera, set_default_camera, Camera3D},
-    color::{GRAY, ORANGE, PURPLE, RED, WHITE, YELLOW},
-    math::{vec3, Vec3},
-    models::{draw_cube, draw_sphere},
-    text::draw_text,
-    time::get_frame_time,
+    camera::{set_camera, set_default_camera, Camera3D}, color::{GRAY, ORANGE, PURPLE, RED, WHITE, YELLOW}, input::{is_key_down, KeyCode}, math::{vec3, Vec3}, models::{draw_cube, draw_sphere}, text::draw_text, time::get_frame_time
 };
 
 use crate::{
@@ -64,6 +59,12 @@ pub fn update_camera(
 ) {
     camera.yaw += mouse_input.mouse_delta.x * get_frame_time() * LOOK_SPEED;
     camera.pitch += mouse_input.mouse_delta.y * get_frame_time() * -LOOK_SPEED;
+    if is_key_down(KeyCode::Q) {
+        camera.roll -= 1.0 * get_frame_time() * LOOK_SPEED;
+    }
+    if is_key_down(KeyCode::E){
+        camera.roll += 1.0 * get_frame_time() * LOOK_SPEED;
+    }
 
     camera.pitch = if camera.pitch > 1.5 {
         1.5

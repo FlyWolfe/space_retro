@@ -152,7 +152,7 @@ void main() {
     //vec3 result = ambient * ObjectColor;
     
     vec3 norm = normalize(Normal);
-    vec3 lightDir = vec3(-0.5, 0.5, 0.0);
+    vec3 lightDir = vec3(-0.25, 0.25, 0.5);
 
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * LightColor;

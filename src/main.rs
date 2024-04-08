@@ -30,7 +30,7 @@ async fn main() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
-    let test_model = Model::new("spaceship_test.obj", "res/spaceship_test/").await;
+    let test_model = Model::new("test.obj", "res/").await;
 
     let mut world = World::new();
 
@@ -103,7 +103,7 @@ async fn main() {
         }
     ));
     world.spawn((
-        Model::new("spaceship_test.obj", "res/spaceship_test/").await,
+        Model::new("test.obj", "res/").await,
         Transform {
             position: vec3(100., 100., 0.),
             scale: Vec3::ONE * 1000.,

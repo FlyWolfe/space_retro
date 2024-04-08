@@ -16,12 +16,6 @@ pub struct Player {
     velocity: Vec3,
     max_speed: f32,
     color: Color,
-    yaw: f32,
-    pitch: f32,
-    roll: f32,
-    front: Vec3,
-    right: Vec3,
-    up: Vec3,
     stabilizing: bool,
     stabilizer_power: f32,
 }
@@ -39,12 +33,6 @@ impl Player {
             velocity: vec3(0., 0., 0.),
             max_speed,
             color,
-            yaw: 0.,
-            pitch: 0.,
-            roll: 0.,
-            front: Vec3::Z,
-            right: Vec3::X,
-            up: Vec3::Y,
             stabilizing: false,
             stabilizer_power: 2.,
         }
@@ -69,29 +57,12 @@ impl Player {
     }
 
     pub fn add_force(&mut self, dir: Vec3, amount: f32) {
-        //self.velocity += (dir.x * amount) * self.right;
-        //self.velocity += (dir.y * amount) * self.up;
-        //self.velocity += (dir.z * amount) * self.front;
         self.velocity += dir * amount;
 
         self.velocity = self.velocity.clamp_length(0., self.max_speed);
         if dir != Vec3::ZERO {
             self.stabilizing = false;
         }
-    }
-
-    pub fn get_yaw_pitch_roll(&self) -> Vec3 {
-        vec3(self.yaw, self.pitch, self.roll)
-    }
-
-    pub fn set_yaw_pitch_roll(&mut self, yaw: f32, pitch: f32, roll: f32) {
-        self.yaw = yaw;
-        self.pitch = pitch;
-        self.roll = roll;
-    }
-
-    pub fn get_up_vector(&self) -> Vec3 {
-        self.up
     }
 }
 

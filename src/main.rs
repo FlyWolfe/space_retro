@@ -30,7 +30,7 @@ async fn main() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
-    let test_model = Model::new("test.obj", "res/").await;
+    let test_model = Model::new("spaceship_test.obj", "res/spaceship_test/").await;
 
     let mut world = World::new();
 
@@ -58,8 +58,8 @@ async fn main() {
     let right = front.cross(world_up).normalize();
     let up = right.cross(front).normalize();
     let camera = CameraState::new(
-        vec3(0., 0., -50.),
-        player.transform.position + vec3(0., 0., -50.),
+        vec3(0., 0., -100.),
+        player.transform.position + vec3(0., 0., -100.),
         front,
         right,
         up,
@@ -161,7 +161,7 @@ async fn main() {
     )
     .unwrap();
 
-    mesh_material.set_uniform("LightColor", (1.0f32, 0.8f32, 0.4f32));
+    mesh_material.set_uniform("LightColor", (1.0f32, 1.0f32, 1.0f32));
     mesh_material.set_uniform("ObjectColor", (1f32, 1f32, 1f32));
 
     let base_mesh_material = BaseMeshMaterial { material: mesh_material };
@@ -262,7 +262,7 @@ float dither4x4(vec2 position, float brightness) {
         if (index == 15) limit = 0.375;
     }
 
-    return brightness < limit ? 0.92 : 1.0;
+    return brightness < limit ? 0.82 : 1.0;
 }
 
 vec3 dither4x4(vec2 position, vec3 color) {

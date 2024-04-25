@@ -89,7 +89,7 @@ pub async fn load_model(file_name: &str, folder_path: &str) -> anyhow::Result<Mo
         let final_path = folder_path.to_owned() + texture_path;
         println!("{}", final_path);
         let diffuse_texture = load_texture(&final_path).await?;
-        diffuse_texture.set_filter(FilterMode::Linear);
+        diffuse_texture.set_filter(FilterMode::Nearest);
         //let normal_texture = Some(load_texture(&m.normal_texture, true, device, queue).await?);
 
         textures.push(diffuse_texture);
@@ -137,7 +137,6 @@ precision mediump float;
 
 in lowp vec2 uv;
 in vec3 Normal;
-in vec3 FragPos;
 
 out vec4 diffuseColor;
 
@@ -151,17 +150,15 @@ void main() {
 
     //vec3 result = ambient * ObjectColor;
     
-    vec3 norm = normalize(Normal);
     vec3 lightDir = vec3(-0.25, 0.25, 0.5);
 
-    float diff = max(dot(norm, lightDir), 0.0);
+    float diff = max(dot(Normal, lightDir), 0.0);
     vec3 diffuse = diff * LightColor;
 
     vec3 result = (ambient + diffuse) * ObjectColor;
-    //FragColor = vec4(result, 1.0);
     vec2 updatedUV = vec2(uv.x, 1.0 - uv.y);
 
-    diffuseColor = vec4(result, 1.0) * texture(Texture, updatedUV);
+    diffuseColor = vec4(result, 1.0);// * texture(Texture, updatedUV);
 }
 "#;
 
@@ -175,15 +172,13 @@ in vec3 normal;
 
 out lowp vec2 uv;
 out vec3 Normal;
-out vec3 FragPos;
 
 uniform mat4 Model;
 uniform mat4 Projection;
 
 void main() {
-    gl_Position = Projection * Model * vec4(position, 1);
+    gl_Position = Projection * Model * vec4(position, 1.0);
     uv = texcoord;
     Normal = normal;
-    FragPos = vec3(Model * vec4(position, 1.0));
 }
 ";
